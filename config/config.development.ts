@@ -1,4 +1,5 @@
-require('dotenv').config()
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require("dotenv").config();
 export default () => ({
   database: {
     dialect: process.env.DB_DIALECT,
