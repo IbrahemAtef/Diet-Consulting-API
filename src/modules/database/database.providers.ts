@@ -1,12 +1,14 @@
-import { ConfigService } from '@nestjs/config';
-import { Sequelize } from 'sequelize-typescript';
-import { SEQUELIZE, DATABASE } from '../../common/constants/constants';
+import { ConfigService } from "@nestjs/config";
+import { Sequelize } from "sequelize-typescript";
+import { CONFIG } from "../../common/constants";
 
 export const databaseProviders = [
   {
-    provide: SEQUELIZE,
+    provide: CONFIG.SEQUELIZE,
     useFactory: async (configService: ConfigService) => {
-      const sequelize = new Sequelize({ ...configService.get(DATABASE) });
+      const sequelize = new Sequelize({
+        ...configService.get(CONFIG.DATABASE),
+      });
       sequelize.addModels([]);
       return sequelize;
     },

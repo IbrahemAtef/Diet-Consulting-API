@@ -1,10 +1,10 @@
 import * as dotenv from "dotenv";
-import { DEVELOPMENT } from "./../src/common/constants/constants";
+import { CONFIG } from "../src/common/constants";
 import defaultConfig from "./config.development";
 
 dotenv.config();
 
-const env = process.env.NODE_ENV || DEVELOPMENT;
+const env = process.env.NODE_ENV || CONFIG.DEVELOPMENT;
 const filePath = `config.${env}`;
 
 let currentConfig = null;
