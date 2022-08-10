@@ -3,38 +3,68 @@ import { Inject, Injectable } from "@nestjs/common";
 import { REPOSITORY } from "../../common/constants";
 import { User } from "./user.model";
 import { LoginDto, SignUpDto } from "./dto";
-import { generateToken, hashPassword } from "src/common/utils";
+import { comparePassword, generateToken, hashPassword } from "src/common/utils";
 import { ConfigService } from "@nestjs/config";
+import { Op } from "sequelize";
+import { InvalidCredentials, UserAlreadyExists } from "src/common/utils/errors";
 
 @Injectable()
 export class UsersService {
   constructor(
     @Inject(REPOSITORY.USER_REPOSITORY)
-    private readonly userRepository: typeof User,
+    private readonly userModel: typeof User,
     private readonly configService: ConfigService
   ) {}
 
   private async create(user: SignUpDto): Promise<User> {
-    return await this.userRepository.create<User>({ ...user });
+    return await this.userModel.create<User>({ ...user });
   }
 
   public async login(user: LoginDto) {
-    const newUser = await this.findOneByEmail(user.email);
+    const userFound = await this.findOneByEmailOrUserName(
+      user.userNameOrEmail,
+      user.userNameOrEmail
+    );
+
+    if (!userFound) {
+      throw InvalidCredentials;
+    }
+
+    const checkPass = await comparePassword(user.password, userFound.password);
+    if (!checkPass) {
+      throw InvalidCredentials;
+    }
 
     // tslint:disable-next-line: no-string-literal
-    const { password, ...result } = newUser["dataValues"];
+    const { password, ...result } = userFound["dataValues"];
+
     const token = await generateToken(
       result.id,
       this.configService.get("jwtSecret")
     );
+
     return { user: result, token };
   }
 
-  private async findOneByEmail(email: string): Promise<User> {
-    return await this.userRepository.findOne({ where: { email } });
+  private async findOneByEmailOrUserName(
+    userName: string,
+    email: string
+  ): Promise<User> {
+    return await this.userModel.findOne({
+      where: { [Op.or]: [{ userName }, { email }] },
+    });
   }
 
   public async signUp(user: SignUpDto) {
+    const userFound = await this.findOneByEmailOrUserName(
+      user.email,
+      user.userName
+    );
+    console.log(userFound);
+
+    if (userFound) {
+      throw UserAlreadyExists;
+    }
     // hash the password
     const pass = await hashPassword(user.password);
 
