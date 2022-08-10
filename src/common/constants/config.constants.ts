@@ -5,4 +5,5 @@ export const CONFIG = {
   PRODUCTION: "production",
   SEQUELIZE: "SEQUELIZE",
   PORT: "PORT",
+  PUBLIC: "Public",
 };
