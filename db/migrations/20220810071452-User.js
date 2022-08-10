@@ -16,6 +16,7 @@ module.exports = {
       user_name: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true,
       },
       email: {
         type: Sequelize.STRING,
@@ -29,6 +30,10 @@ module.exports = {
       first_name: {
         type: Sequelize.STRING,
         allowNull: false,
+      },
+      middle_name: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       last_name: {
         type: Sequelize.STRING,

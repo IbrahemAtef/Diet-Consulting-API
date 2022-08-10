@@ -28,6 +28,9 @@ export class User extends Model {
   firstName: string;
 
   @Column(DataType.STRING)
+  middleName?: string;
+
+  @Column(DataType.STRING)
   lastName: string;
 
   @Column(DataType.ENUM(...Object.values(ROLES)))
