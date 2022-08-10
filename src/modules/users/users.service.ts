@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Inject, Injectable } from "@nestjs/common";
-import { REPOSITORY } from "../../common/constants";
+import { PROVIDERS } from "../../common/constants";
 import { User } from "./user.model";
 import { LoginDto, SignUpDto } from "./dto";
 import { comparePassword, generateToken, hashPassword } from "src/common/utils";
@@ -11,7 +11,7 @@ import { InvalidCredentials, UserAlreadyExists } from "src/common/utils/errors";
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject(REPOSITORY.USER_REPOSITORY)
+    @Inject(PROVIDERS.USERS_PROVIDER)
     private readonly userModel: typeof User,
     private readonly configService: ConfigService
   ) {}
