@@ -8,4 +8,14 @@ export class CreateAnswerDto {
   @IsNotEmpty()
   @IsString()
   description: string;
+
+  @IsNotEmpty()
+  @IsString()
+  recommendations: string;
+
+  @IsNotEmpty()
+  questionId: number;
+
+  @IsNotEmpty()
+  isDraft: boolean;
 }

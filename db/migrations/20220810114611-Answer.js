@@ -40,6 +40,25 @@ module.exports = {
           key: "id",
         },
       },
+      created_at: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.fn("NOW"),
+      },
+      updated_at: {
+        type: Sequelize.DATE,
+      },
+      deleted_at: {
+        type: Sequelize.DATE,
+      },
+      created_by: {
+        type: Sequelize.STRING,
+      },
+      updated_by: {
+        type: Sequelize.STRING,
+      },
+      deleted_by: {
+        type: Sequelize.STRING,
+      },
     });
   },
   down: (queryInterface, Sequelize) => {

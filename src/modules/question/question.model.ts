@@ -7,10 +7,58 @@ import {
   HasMany,
   Model,
   PrimaryKey,
+  Scopes,
   Table,
 } from "sequelize-typescript";
 import { Answer } from "../answer/answer.model";
+import sequelize, { Op } from "sequelize";
 
+@Scopes(() => ({
+  oneQuestionWithAnswers: {
+    include: [
+      {
+        model: Answer,
+        required: false,
+        where: {
+          isDraft: false,
+        },
+        include: [
+          {
+            model: User,
+            attributes: ["id", "firstName", "lastName"],
+          },
+        ],
+      },
+    ],
+  },
+  withAnswers(limit: number, userId: string, pageNum: number, offset: number) {
+    return {
+      attributes: [
+        "id",
+        "title",
+        "description",
+        [
+          sequelize.fn("count", sequelize.col("Answer.question_id")),
+          "totalAnswers",
+        ],
+      ],
+      include: [
+        {
+          model: Answer,
+          required: false,
+          duplicating: false,
+          where: {
+            [Op.and]: [{ userId }, { isDraft: false }],
+          },
+        },
+      ],
+      group: ["Question.id"],
+      order: [[sequelize.col("totalAnswers"), "ASC"]], // search for the order
+      limit,
+      offset: pageNum * offset,
+    };
+  },
+}))
 @Table({ paranoid: true, tableName: "Question", underscored: true })
 export class Question extends Model {
   @PrimaryKey

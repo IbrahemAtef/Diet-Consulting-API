@@ -5,7 +5,7 @@ import { User } from "./user.model";
 import { LoginDto, SignUpDto } from "./dto";
 import { comparePassword, generateToken, hashPassword } from "src/common/utils";
 import { ConfigService } from "@nestjs/config";
-import { Op } from "sequelize";
+import { Op, Transaction } from "sequelize";
 import { InvalidCredentials, UserAlreadyExists } from "src/common/utils/errors";
 
 @Injectable()
@@ -15,10 +15,6 @@ export class UsersService {
     private readonly userModel: typeof User,
     private readonly configService: ConfigService
   ) {}
-
-  private async create(user: SignUpDto): Promise<User> {
-    return await this.userModel.create<User>({ ...user });
-  }
 
   public async login(user: LoginDto) {
     const userFound = await this.findOneByEmailOrUserName(
@@ -55,7 +51,7 @@ export class UsersService {
     });
   }
 
-  public async signUp(user: SignUpDto) {
+  public async signUp(user: SignUpDto, transaction: Transaction) {
     const userFound = await this.findOneByEmailOrUserName(
       user.email,
       user.userName
@@ -65,10 +61,13 @@ export class UsersService {
       throw UserAlreadyExists;
     }
     // hash the password
-    const pass = await hashPassword(user.password);
+    user.password = await hashPassword(user.password);
 
     // create the user
-    const newUser = await this.create({ ...user, password: pass });
+    const newUser = await this.userModel.create<User>(
+      { ...user },
+      { transaction }
+    );
 
     // tslint:disable-next-line: no-string-literal
     const { password, ...result } = newUser["dataValues"];
