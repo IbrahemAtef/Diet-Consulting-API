@@ -30,4 +30,22 @@ export class Question extends Model {
 
   @HasMany(() => Answer)
   answers: Answer[];
+
+  @Column(DataType.DATE)
+  createdAt: Date;
+
+  @Column(DataType.DATE)
+  updatedAt: Date;
+
+  @Column(DataType.DATE)
+  deletedAt: Date;
+
+  @Column(DataType.STRING)
+  createdBy: string;
+
+  @Column(DataType.STRING)
+  updatedBy: string;
+
+  @Column(DataType.STRING)
+  deletedBy: string;
 }

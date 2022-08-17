@@ -60,7 +60,6 @@ export class UsersService {
       user.email,
       user.userName
     );
-    console.log(userFound);
 
     if (userFound) {
       throw UserAlreadyExists;
