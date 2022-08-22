@@ -1,4 +1,3 @@
-import { ROLES } from "./../../common/enums";
 import {
   Table,
   Column,
@@ -6,14 +5,36 @@ import {
   Model,
   PrimaryKey,
   AutoIncrement,
+  Scopes,
 } from "sequelize-typescript";
+import { ROLES } from "../../common/enums";
 
-@Table({ tableName: "User", underscored: true, paranoid: true })
-export class User extends Model {
+@Scopes(() => {
+  return {
+    no_password: {
+      attributes: {
+        exclude: ["password"],
+      },
+    },
+    basic: {
+      attributes: {
+        exclude: [
+          "updatedAt",
+          "createdAt",
+          "updatedBy",
+          "createdBy",
+          "deletedAt",
+        ],
+      },
+    },
+  };
+})
+@Table({ tableName: "Users", underscored: true, paranoid: true })
+export class Users extends Model<Users> {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
-  id!: number;
+  id: number;
 
   @Column(DataType.STRING)
   userName: string;
@@ -45,12 +66,12 @@ export class User extends Model {
   @Column(DataType.DATE)
   deletedAt: Date;
 
-  @Column(DataType.STRING)
-  createdBy: string;
+  @Column(DataType.INTEGER)
+  createdBy: number;
 
-  @Column(DataType.STRING)
-  updatedBy: string;
+  @Column(DataType.INTEGER)
+  updatedBy: number;
 
-  @Column(DataType.STRING)
-  deletedBy: string;
+  @Column(DataType.INTEGER)
+  deletedBy: number;
 }

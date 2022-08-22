@@ -1,19 +1,18 @@
-import { User } from "../users/user.model";
-import { Question } from "../question/question.model";
 import {
   AutoIncrement,
   BelongsTo,
   Column,
   DataType,
   ForeignKey,
-  //   HasMany,
   Model,
   PrimaryKey,
   Table,
 } from "sequelize-typescript";
+import { Users } from "../users/users.model";
+import { Questions } from "../questions/questions.model";
 
-@Table({ tableName: "Answer", paranoid: true, underscored: true })
-export class Answer extends Model {
+@Table({ tableName: "Answers", paranoid: true, underscored: true })
+export class Answers extends Model<Answers> {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
@@ -31,19 +30,19 @@ export class Answer extends Model {
   @Column(DataType.BOOLEAN)
   isDraft: boolean;
 
-  @ForeignKey(() => User)
+  @ForeignKey(() => Users)
   @Column(DataType.INTEGER)
   userId: number;
 
-  @ForeignKey(() => Question)
+  @ForeignKey(() => Questions)
   @Column(DataType.INTEGER)
   questionId: number;
 
-  @BelongsTo(() => Question)
-  question: Question;
+  @BelongsTo(() => Questions)
+  question: Questions;
 
-  @BelongsTo(() => User)
-  user: User;
+  @BelongsTo(() => Users)
+  user: Users;
 
   @Column(DataType.DATE)
   createdAt: Date;
@@ -54,14 +53,12 @@ export class Answer extends Model {
   @Column(DataType.DATE)
   deletedAt: Date;
 
-  @Column(DataType.STRING)
-  createdBy: string;
+  @Column(DataType.INTEGER)
+  createdBy: number;
 
-  @Column(DataType.STRING)
-  updatedBy: string;
+  @Column(DataType.INTEGER)
+  updatedBy: number;
 
-  @Column(DataType.STRING)
-  deletedBy: string;
-  // @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
-  // verified: boolean;
+  @Column(DataType.INTEGER)
+  deletedBy: number;
 }

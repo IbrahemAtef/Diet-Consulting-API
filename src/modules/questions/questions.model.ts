@@ -1,4 +1,3 @@
-import { User } from "../users/user.model";
 import {
   AutoIncrement,
   Column,
@@ -10,41 +9,42 @@ import {
   Scopes,
   Table,
 } from "sequelize-typescript";
-import { Answer } from "../answer/answer.model";
 import sequelize, { Op } from "sequelize";
+import { Users } from "../users/users.model";
+import { Answers } from "../answers/answers.model";
 
 @Scopes(() => ({
   oneQuestionWithAnswers: {
     include: [
       {
-        model: Answer,
+        model: Answers,
         required: false,
         where: {
           isDraft: false,
         },
         include: [
           {
-            model: User,
+            model: Users,
             attributes: ["id", "firstName", "lastName"],
           },
         ],
       },
     ],
   },
-  withAnswers(limit: number, userId: string, pageNum: number, offset: number) {
+  withAnswers(limit: number, userId: string, offset: number) {
     return {
       attributes: [
         "id",
         "title",
         "description",
         [
-          sequelize.fn("count", sequelize.col("Answer.question_id")),
+          sequelize.fn("count", sequelize.col("Answers.question_id")),
           "totalAnswers",
         ],
       ],
       include: [
         {
-          model: Answer,
+          model: Answers,
           required: false,
           duplicating: false,
           where: {
@@ -52,15 +52,15 @@ import sequelize, { Op } from "sequelize";
           },
         },
       ],
-      group: ["Question.id"],
+      group: ["Questions.id"],
       order: [[sequelize.col("totalAnswers"), "ASC"]], // search for the order
-      limit,
-      offset: pageNum * offset,
+      // limit,
+      // offset: offset,
     };
   },
 }))
-@Table({ paranoid: true, tableName: "Question", underscored: true })
-export class Question extends Model {
+@Table({ paranoid: true, tableName: "Questions", underscored: true })
+export class Questions extends Model<Questions> {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
@@ -72,12 +72,12 @@ export class Question extends Model {
   @Column(DataType.STRING)
   description: string;
 
-  @ForeignKey(() => User)
+  @ForeignKey(() => Users)
   @Column(DataType.INTEGER)
   userId: number;
 
-  @HasMany(() => Answer)
-  answers: Answer[];
+  @HasMany(() => Answers)
+  answers: Answers[];
 
   @Column(DataType.DATE)
   createdAt: Date;
@@ -88,12 +88,12 @@ export class Question extends Model {
   @Column(DataType.DATE)
   deletedAt: Date;
 
-  @Column(DataType.STRING)
-  createdBy: string;
+  @Column(DataType.INTEGER)
+  createdBy: number;
 
-  @Column(DataType.STRING)
-  updatedBy: string;
+  @Column(DataType.INTEGER)
+  updatedBy: number;
 
-  @Column(DataType.STRING)
-  deletedBy: string;
+  @Column(DataType.INTEGER)
+  deletedBy: number;
 }

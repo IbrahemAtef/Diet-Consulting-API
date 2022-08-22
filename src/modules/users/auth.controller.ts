@@ -1,27 +1,21 @@
-import { Body, Controller, Post, UseInterceptors } from "@nestjs/common";
-import { Transaction } from "sequelize";
+import { Body, Controller, Post } from "@nestjs/common";
 import { Public } from "src/common/decorators";
-import { TransactionParam } from "src/common/decorators/transaction.decorator";
-import { LoginDto, SignUpDto } from "./dto";
 import { UsersService } from "./users.service";
+import { LoginDto, SignUpDto } from "./dto";
 
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly userService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
 
-  @UseInterceptors()
   @Public()
   @Post("signup")
-  async signup(
-    @Body() newUser: SignUpDto,
-    @TransactionParam() transaction: Transaction
-  ) {
-    return this.userService.signUp(newUser, transaction);
+  async signup(@Body() newUser: SignUpDto): Promise<any> {
+    return this.usersService.signUp(newUser);
   }
 
   @Public()
   @Post("login")
-  async login(@Body() loginUser: LoginDto) {
-    return this.userService.login(loginUser);
+  async login(@Body() loginUser: LoginDto): Promise<any> {
+    return this.usersService.login(loginUser);
   }
 }

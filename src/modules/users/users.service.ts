@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Inject, Injectable } from "@nestjs/common";
-import { PROVIDERS } from "../../common/constants";
-import { User } from "./user.model";
-import { LoginDto, SignUpDto } from "./dto";
-import { comparePassword, generateToken, hashPassword } from "src/common/utils";
 import { ConfigService } from "@nestjs/config";
-import { Op, Transaction } from "sequelize";
+import { Op } from "sequelize";
 import { InvalidCredentials, UserAlreadyExists } from "src/common/utils/errors";
+import { comparePassword, generateToken, hashPassword } from "src/common/utils";
+import { Users } from "./users.model";
+import { CONFIG, PROVIDERS } from "../../common/constants";
+import { LoginDto, SignUpDto } from "./dto";
 
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject(PROVIDERS.USERS_PROVIDER)
-    private readonly userModel: typeof User,
+    @Inject(PROVIDERS.USER_PROVIDER)
+    private readonly userModel: typeof Users,
     private readonly configService: ConfigService
   ) {}
 
-  public async login(user: LoginDto) {
+  public async login(user: LoginDto): Promise<any> {
     const userFound = await this.findOneByEmailOrUserName(
       user.userNameOrEmail,
       user.userNameOrEmail
@@ -36,7 +36,7 @@ export class UsersService {
 
     const token = await generateToken(
       result.id,
-      this.configService.get("jwtSecret")
+      this.configService.get(CONFIG.JWT_SECRET)
     );
 
     return { user: result, token };
@@ -45,13 +45,17 @@ export class UsersService {
   private async findOneByEmailOrUserName(
     userName: string,
     email: string
-  ): Promise<User> {
-    return await this.userModel.findOne({
+  ): Promise<Users> {
+    return this.userModel.scope(["basic"]).findOne({
       where: { [Op.or]: [{ userName }, { email }] },
     });
   }
-
-  public async signUp(user: SignUpDto, transaction: Transaction) {
+  public async findUserById(id: number): Promise<Users> {
+    return this.userModel.scope(["no_password", "basic"]).findOne({
+      where: { id },
+    });
+  }
+  public async signUp(user: SignUpDto): Promise<any> {
     const userFound = await this.findOneByEmailOrUserName(
       user.email,
       user.userName
@@ -64,10 +68,7 @@ export class UsersService {
     user.password = await hashPassword(user.password);
 
     // create the user
-    const newUser = await this.userModel.create<User>(
-      { ...user },
-      { transaction }
-    );
+    const newUser = await this.userModel.create<Users>({ ...user });
 
     // tslint:disable-next-line: no-string-literal
     const { password, ...result } = newUser["dataValues"];
@@ -75,7 +76,7 @@ export class UsersService {
     // generate token
     const token = await generateToken(
       result.id,
-      this.configService.get("jwtSecret")
+      this.configService.get(CONFIG.JWT_SECRET)
     );
 
     // return the user and the token

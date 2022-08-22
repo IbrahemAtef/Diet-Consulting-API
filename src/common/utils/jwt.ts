@@ -1,19 +1,17 @@
-import { ConfigService } from "@nestjs/config";
 import * as jwt from "jsonwebtoken";
-// import { SYSTEM } from "../constants/general";
 
-// export const verifyToken = (token, secret) =>
-//   jwt.verify(token, secret, (err, decode) => {
-//     if (err) {
-//       return false;
-//     }
-//     return decode;
-//   });
+const verifyToken = (token: string, secret: number) =>
+  jwt.verify(token, secret, (err, decode) => {
+    if (err) {
+      return false;
+    }
+    return decode;
+  });
 
-const generateToken = (id: number, SECRET_KEY) => {
+const generateToken = (id: number, SECRET_KEY: number) => {
   return jwt.sign({ id }, SECRET_KEY, {
     expiresIn: "8h",
   });
 };
 
-export { generateToken };
+export { generateToken, verifyToken };

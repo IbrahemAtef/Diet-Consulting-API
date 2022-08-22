@@ -5,5 +5,6 @@ export enum ExceptionsEnum {
   INVALID_CREDENTIALS = "Invalid credentials",
   DRAFT_ALREADY_EXISTS = "Draft already exists",
   QUESTION_NOT_FOUND = "Question not found",
+  QUESTION_NOT_FOR_USER = "Question not for this user",
   ANSWER_NOT_FOUND = "Answer not found",
 }

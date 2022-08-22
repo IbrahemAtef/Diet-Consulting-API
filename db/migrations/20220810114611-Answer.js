@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable("Answer", {
+    return queryInterface.createTable("Answers", {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -27,8 +27,9 @@ module.exports = {
       question_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        unique: true,
         references: {
-          model: "Question",
+          model: "Questions",
           key: "id",
         },
       },
@@ -36,7 +37,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "User",
+          model: "Users",
           key: "id",
         },
       },
@@ -51,13 +52,14 @@ module.exports = {
         type: Sequelize.DATE,
       },
       created_by: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
+        unique: true,
       },
       updated_by: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
       },
       deleted_by: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
       },
     });
   },
@@ -69,5 +71,6 @@ module.exports = {
       Example:
       return queryInterface.dropTable('users');
     */
+    return queryInterface.dropTable("Answers");
   },
 };

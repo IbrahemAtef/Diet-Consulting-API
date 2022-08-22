@@ -26,6 +26,11 @@ const QuestionNotFound = new HttpException(
   HttpStatus.NOT_FOUND
 );
 
+const QuestionNotForUser = new HttpException(
+  ExceptionsEnum.QUESTION_NOT_FOR_USER,
+  HttpStatus.NOT_FOUND
+);
+
 const AnswerNotFound = new HttpException(
   ExceptionsEnum.ANSWER_NOT_FOUND,
   HttpStatus.NOT_FOUND
@@ -44,4 +49,5 @@ export {
   QuestionNotFound,
   AnswerNotFound,
   InvalidCredentials,
+  QuestionNotForUser,
 };

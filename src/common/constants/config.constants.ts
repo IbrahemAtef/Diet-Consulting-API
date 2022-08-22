@@ -6,4 +6,5 @@ export const CONFIG = {
   SEQUELIZE: "SEQUELIZE",
   PORT: "PORT",
   PUBLIC: "Public",
+  JWT_SECRET: "jwtSecret",
 };

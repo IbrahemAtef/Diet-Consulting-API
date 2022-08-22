@@ -7,9 +7,9 @@ import {
   Matches,
   IsOptional,
 } from "class-validator";
+import { ROLES } from "src/common/enums";
 import { MessageEnum } from "../../../common/enums";
 import { PATTERN } from "../../../common/constants/";
-import { ROLES } from "src/common/enums";
 
 export class SignUpDto {
   @IsNotEmpty()

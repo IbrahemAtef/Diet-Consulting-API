@@ -9,7 +9,7 @@ module.exports = {
       Example:
       return queryInterface.createTable('users', { id: Sequelize.INTEGER });
     */
-    return queryInterface.createTable("Question", {
+    return queryInterface.createTable("Questions", {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -23,16 +23,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      // is_answered: {
-      //   type: Sequelize.BOOLEAN,
-      //   allowNull: false,
-      //   defaultValue: false,
-      // },
       user_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "User",
+          model: "Users",
           key: "id",
         },
       },
@@ -47,13 +42,13 @@ module.exports = {
         type: Sequelize.DATE,
       },
       created_by: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
       },
       updated_by: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
       },
       deleted_by: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
       },
     });
   },
@@ -66,5 +61,6 @@ module.exports = {
       Example:
       return queryInterface.dropTable('users');
     */
+    return queryInterface.dropTable("Questions");
   },
 };

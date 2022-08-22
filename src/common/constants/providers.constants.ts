@@ -1,5 +1,5 @@
 export const PROVIDERS = {
-  USERS_PROVIDER: "usersProvider",
-  QUESTIONS_PROVIDER: "questionsProvider",
-  ANSWERS_PROVIDER: "answersProvider",
+  USER_PROVIDER: "userProvider",
+  QUESTION_PROVIDER: "questionProvider",
+  ANSWER_PROVIDER: "answerProvider",
 };
