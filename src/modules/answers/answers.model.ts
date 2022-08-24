@@ -11,7 +11,12 @@ import {
 import { Users } from "../users/users.model";
 import { Questions } from "../questions/questions.model";
 
-@Table({ tableName: "Answers", paranoid: true, underscored: true })
+@Table({
+  tableName: "Answers",
+  paranoid: true,
+  timestamps: true,
+  underscored: true,
+})
 export class Answers extends Model<Answers> {
   @PrimaryKey
   @AutoIncrement

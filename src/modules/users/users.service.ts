@@ -32,13 +32,13 @@ export class UsersService {
     }
 
     // tslint:disable-next-line: no-string-literal
-    const { password, ...result } = userFound["dataValues"];
+    const { password, middleName, ...result } = userFound["dataValues"];
 
     const token = await generateToken(
       result.id,
       this.configService.get(CONFIG.JWT_SECRET)
     );
-
+    if (middleName) result.middleName = middleName;
     return { user: result, token };
   }
 
@@ -71,14 +71,14 @@ export class UsersService {
     const newUser = await this.userModel.create<Users>({ ...user });
 
     // tslint:disable-next-line: no-string-literal
-    const { password, ...result } = newUser["dataValues"];
+    const { password, middleName, ...result } = newUser["dataValues"];
 
     // generate token
     const token = await generateToken(
       result.id,
       this.configService.get(CONFIG.JWT_SECRET)
     );
-
+    if (middleName) result.middleName = middleName;
     // return the user and the token
     return { user: result, token };
   }

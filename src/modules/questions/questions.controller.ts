@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -30,8 +29,6 @@ export class QuestionsController {
     @UserIdentity() user: UserInfoDto,
     @Body() data: CreateQuestionsDto
   ): Promise<Questions> {
-    console.log(user, data);
-
     return this.questionsService.createQuestion(data, user);
   }
 

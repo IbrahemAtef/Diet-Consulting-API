@@ -21,8 +21,6 @@ export class QuestionsService {
     question: CreateQuestionsDto,
     user: UserInfoDto
   ): Promise<Questions> {
-    console.log(question, user);
-
     return this.questionModel.create({
       ...question,
       userId: user.id,
@@ -40,6 +38,7 @@ export class QuestionsService {
     const questions = await this.questionModel.findAll({
       limit,
       offset: pageNr * offset,
+      order: [["tags", "DESC"]],
     });
     return questions;
   }
@@ -95,7 +94,8 @@ export class QuestionsService {
     if (!question) {
       throw QuestionNotFound;
     }
-    await question.update({ deletedAt: new Date(), deletedBy: user.id });
+    await question.update({ deletedBy: user.id });
+    await question.destroy();
     return question;
   }
 

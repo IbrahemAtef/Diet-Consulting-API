@@ -1,5 +1,6 @@
 export enum MessageEnum {
   CHECK_ROLE = "role must be either patient or consultant",
+  CHECK_TAGS = "tag must be one of these: Diabetes, Rare Diseases, Athletes Diseases, Hypertension",
   WEAK_PASSWORD = "password is weak",
   UNAUTHORIZED_EXCEPTION = "You are not authorized to perform the operation",
   INVALID_CREDENTIALS = "Invalid user credentials",

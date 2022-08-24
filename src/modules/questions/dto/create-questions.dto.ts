@@ -1,4 +1,6 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsEnum, IsNotEmpty, IsString } from "class-validator";
+import { MessageEnum } from "src/common/enums";
+import { TAGS } from "./../../../common/enums/tags.enums";
 
 export class CreateQuestionsDto {
   @IsNotEmpty()
@@ -8,4 +10,10 @@ export class CreateQuestionsDto {
   @IsNotEmpty()
   @IsString()
   description: string;
+
+  @IsNotEmpty()
+  @IsEnum(TAGS, {
+    message: MessageEnum.CHECK_TAGS,
+  })
+  tags: TAGS;
 }

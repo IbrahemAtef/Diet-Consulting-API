@@ -21,7 +21,7 @@ export class SignUpDto {
   email: string;
 
   @IsNotEmpty()
-  @MinLength(6)
+  @MinLength(8)
   @Matches(PATTERN, { message: MessageEnum.WEAK_PASSWORD })
   password: string;
 

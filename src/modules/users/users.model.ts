@@ -24,12 +24,18 @@ import { ROLES } from "../../common/enums";
           "updatedBy",
           "createdBy",
           "deletedAt",
+          "deletedBy",
         ],
       },
     },
   };
 })
-@Table({ tableName: "Users", underscored: true, paranoid: true })
+@Table({
+  tableName: "Users",
+  underscored: true,
+  paranoid: true,
+  timestamps: true,
+})
 export class Users extends Model<Users> {
   @PrimaryKey
   @AutoIncrement

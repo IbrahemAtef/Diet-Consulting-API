@@ -9,9 +9,9 @@ import {
   Scopes,
   Table,
 } from "sequelize-typescript";
-import sequelize, { Op } from "sequelize";
 import { Users } from "../users/users.model";
 import { Answers } from "../answers/answers.model";
+import { TAGS } from "./../../common/enums/tags.enums";
 
 @Scopes(() => ({
   oneQuestionWithAnswers: {
@@ -32,7 +32,12 @@ import { Answers } from "../answers/answers.model";
     ],
   },
 }))
-@Table({ paranoid: true, tableName: "Questions", underscored: true })
+@Table({
+  paranoid: true,
+  tableName: "Questions",
+  underscored: true,
+  timestamps: true,
+})
 export class Questions extends Model<Questions> {
   @PrimaryKey
   @AutoIncrement
@@ -44,6 +49,9 @@ export class Questions extends Model<Questions> {
 
   @Column(DataType.STRING)
   description: string;
+
+  @Column(DataType.ENUM(...Object.values(TAGS)))
+  tags: string;
 
   @ForeignKey(() => Users)
   @Column(DataType.INTEGER)
