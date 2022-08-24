@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { DatabaseModule } from "./modules/database/database.module";
 import { UsersModule } from "./modules/users/users.module";
@@ -14,5 +14,6 @@ import currentConfig from "../config";
     QuestionsModule,
     AnswersModule,
   ],
+  providers: [Logger],
 })
 export class AppModule {}
