@@ -31,33 +31,6 @@ import { Answers } from "../answers/answers.model";
       },
     ],
   },
-  withAnswers(limit: number, userId: string, offset: number) {
-    return {
-      attributes: [
-        "id",
-        "title",
-        "description",
-        [
-          sequelize.fn("count", sequelize.col("Answers.question_id")),
-          "totalAnswers",
-        ],
-      ],
-      include: [
-        {
-          model: Answers,
-          required: false,
-          duplicating: false,
-          where: {
-            [Op.and]: [{ userId }, { isDraft: false }],
-          },
-        },
-      ],
-      group: ["Questions.id"],
-      order: [[sequelize.col("totalAnswers"), "ASC"]], // search for the order
-      // limit,
-      // offset: offset,
-    };
-  },
 }))
 @Table({ paranoid: true, tableName: "Questions", underscored: true })
 export class Questions extends Model<Questions> {

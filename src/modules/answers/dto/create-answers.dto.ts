@@ -12,10 +12,4 @@ export class CreateAnswersDto {
   @IsNotEmpty()
   @IsString()
   recommendations: string;
-
-  @IsNotEmpty()
-  questionId: number;
-
-  @IsNotEmpty()
-  isDraft: boolean;
 }

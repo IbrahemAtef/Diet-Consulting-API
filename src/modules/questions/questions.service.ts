@@ -32,15 +32,16 @@ export class QuestionsService {
 
   public async getAllQuestions(
     limit: number,
-    user: UserInfoDto,
-    offset: number
-  ): Promise<any> {
-    const questions = await this.questionModel
-      .scope({ method: ["withAnswers", limit, user.id, offset] })
-      .findAll();
-    return {
-      data: questions,
-    };
+    offset: number,
+    pageNr: number
+  ): Promise<Questions[]> {
+    // console.log(limit, offset, pageNr);
+
+    const questions = await this.questionModel.findAll({
+      limit,
+      offset: pageNr * offset,
+    });
+    return questions;
   }
 
   public async getOneQuestionWithAnswers(
@@ -106,15 +107,12 @@ export class QuestionsService {
     const q = await this.questionModel.findOne({
       where: {
         id: questionId,
-        userId: user.id,
       },
     });
     if (!q) {
       throw QuestionNotFound;
     }
-    if (q.createdBy !== user.id) {
-      throw QuestionNotForUser;
-    }
+
     return this.answersService.createOrUpdateDraftAnswer(
       data,
       questionId,

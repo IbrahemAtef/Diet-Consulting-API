@@ -27,7 +27,6 @@ module.exports = {
       question_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        unique: true,
         references: {
           model: "Questions",
           key: "id",
@@ -53,7 +52,6 @@ module.exports = {
       },
       created_by: {
         type: Sequelize.INTEGER,
-        unique: true,
       },
       updated_by: {
         type: Sequelize.INTEGER,

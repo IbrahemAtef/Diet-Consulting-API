@@ -20,15 +20,18 @@ export class AnswersService {
     user: UserInfoDto
   ): Promise<Answers> {
     const ans = await this.findDraft(questionId, user);
+
     if (ans) {
       return this.updateDraft(answer, questionId, user);
     } else {
-      return this.answerModel.create({
+      const a = await this.answerModel.create({
         ...answer,
         questionId,
         userId: user.id,
         createdBy: user.id,
       });
+
+      return a;
     }
   }
 

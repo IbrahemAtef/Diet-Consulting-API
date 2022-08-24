@@ -57,13 +57,15 @@ export class QuestionsController {
   @Roles(ROLES.CONSULTANT)
   @Get()
   async findAllQuestions(
-    @UserIdentity() user: UserInfoDto,
-    @Query("offset", ParseIntPipe) offset?: number,
-    @Query("limit", ParseIntPipe) limit?: number
-  ): Promise<any> {
-    console.log(offset, limit);
-
-    return this.questionsService.getAllQuestions(limit, user, offset);
+    @Query("offset") offset?: number,
+    @Query("limit") limit?: number,
+    @Query("pageNr") pageNr?: number
+  ): Promise<Questions[]> {
+    return this.questionsService.getAllQuestions(
+      limit || 10,
+      offset || 10,
+      pageNr || 0
+    );
   }
 
   @Roles(ROLES.CONSULTANT)
@@ -89,7 +91,7 @@ export class QuestionsController {
   }
 
   @Roles(ROLES.CONSULTANT)
-  @Patch(":questionId")
+  @Patch("/submitDraft/:questionId")
   async submitDraftAnswer(
     @UserIdentity() user: UserInfoDto,
     @Param("questionId") questionId: number
