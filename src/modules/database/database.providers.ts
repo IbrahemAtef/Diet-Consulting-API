@@ -1,20 +1,27 @@
 import { ConfigService } from "@nestjs/config";
-import { Sequelize } from "sequelize-typescript";
+import { DataSource } from "typeorm";
 import { Users } from "../users/users.model";
 import { Questions } from "../questions/questions.model";
 import { Answers } from "./../answers/answers.model";
-import { CONFIG } from "../../common/constants";
+import { CONFIG, PROVIDERS } from "../../common/constants";
 
 export const databaseProviders = [
   {
-    provide: CONFIG.SEQUELIZE,
+    provide: PROVIDERS.DATABASE_CONNECTION,
     useFactory: async (configService: ConfigService) => {
-      const sequelize = new Sequelize({
-        ...configService.get(CONFIG.DATABASE),
-        sync: { force: false },
+      const dataSource = new DataSource({
+        type: configService.get(CONFIG.DATABASE).dialect,
+        host: configService.get(CONFIG.DATABASE).host || "localhost",
+        port: configService.get(CONFIG.DATABASE).port || 27017,
+        database: configService.get(CONFIG.DATABASE).database || "test",
+        entities: [Users, Questions, Answers],
+        logging: true,
+        synchronize: false,
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
       });
-      sequelize.addModels([Users, Questions, Answers]);
-      return sequelize;
+      // do we need await
+      return await dataSource.initialize();
     },
     inject: [ConfigService],
   },

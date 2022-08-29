@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { Op } from "sequelize";
+import { Repository } from "typeorm";
 import { AnswerNotFound } from "src/common/utils/errors";
 import { UserInfoDto } from "./../../common/dto/user_info.dto";
 import { PROVIDERS } from "../../common/constants/providers.constants";
@@ -11,7 +11,7 @@ import { UpdateAnswersDto } from "./dto/update-answers.dto";
 export class AnswersService {
   constructor(
     @Inject(PROVIDERS.ANSWER_PROVIDER)
-    private readonly answerModel: typeof Answers
+    private readonly answerRepository: Repository<Answers>
   ) {}
 
   public async createOrUpdateDraftAnswer(
@@ -24,7 +24,7 @@ export class AnswersService {
     if (ans) {
       return this.updateDraft(answer, questionId, user);
     } else {
-      const a = await this.answerModel.create({
+      const a = await this.answerRepository.save({
         ...answer,
         questionId,
         userId: user.id,
@@ -36,9 +36,9 @@ export class AnswersService {
   }
 
   public async findAll(questionId: number): Promise<Answers[]> {
-    const answers = await this.answerModel.findAll({
+    const answers = await this.answerRepository.find({
       where: { questionId, isDraft: false },
-      order: [["createdAt", "DESC"]],
+      order: { createdAt: "DESC" },
     });
     return answers;
   }
@@ -47,9 +47,11 @@ export class AnswersService {
     questionId: number,
     user: UserInfoDto
   ): Promise<Answers> {
-    return this.answerModel.findOne({
+    return this.answerRepository.findOne({
       where: {
-        [Op.and]: [{ userId: user.id }, { questionId }, { isDraft: true }],
+        userId: user.id,
+        questionId,
+        isDraft: true,
       },
     });
   }
@@ -60,8 +62,13 @@ export class AnswersService {
     user: UserInfoDto
   ): Promise<Answers> {
     const ans = await this.findDraft(questionId, user);
-    await ans.update({ ...answer, updatedAt: new Date(), updatedBy: user.id });
-    return ans;
+    await this.answerRepository.update(ans, {
+      ...answer,
+      updatedAt: new Date(),
+      updatedBy: user.id,
+    });
+    const ans2 = await this.findDraft(questionId, user);
+    return ans2;
   }
 
   public async publishDraft(
@@ -72,25 +79,33 @@ export class AnswersService {
     if (!ans) {
       throw AnswerNotFound;
     }
-    await ans.update({
+    await this.answerRepository.update(ans, {
       updatedAt: new Date(),
       updatedBy: user.id,
       isDraft: false,
     });
-    return ans;
+    const ans2 = await this.findDraft(questionId, user);
+    return ans2;
   }
 
   public async deleteAnswer(
     answerId: number,
     user: UserInfoDto
   ): Promise<Answers> {
-    const answer = await this.answerModel.findOne({
+    const answer = await this.answerRepository.findOne({
       where: { id: answerId, userId: user.id },
     });
     if (!answer) {
       throw AnswerNotFound;
     }
-    await answer.update({ deletedBy: user.id, deletedAt: new Date() });
-    return answer;
+    await this.answerRepository.update(answer, {
+      deletedBy: user.id,
+      deletedAt: new Date(),
+    });
+    await this.answerRepository.softDelete(answer);
+    const answer2 = await this.answerRepository.findOne({
+      where: { id: answerId, userId: user.id },
+    });
+    return answer2;
   }
 }

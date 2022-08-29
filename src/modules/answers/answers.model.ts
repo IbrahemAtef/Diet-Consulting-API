@@ -1,69 +1,51 @@
-import {
-  AutoIncrement,
-  BelongsTo,
-  Column,
-  DataType,
-  ForeignKey,
-  Model,
-  PrimaryKey,
-  Table,
-} from "sequelize-typescript";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { Users } from "../users/users.model";
 import { Questions } from "../questions/questions.model";
 
-@Table({
-  tableName: "Answers",
-  paranoid: true,
-  timestamps: true,
-  underscored: true,
-})
-export class Answers extends Model<Answers> {
-  @PrimaryKey
-  @AutoIncrement
-  @Column(DataType.INTEGER)
+@Entity({ name: "Answers" })
+export class Answers {
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column(DataType.STRING)
+  @Column({ type: "string" })
   title: string;
 
-  @Column(DataType.STRING)
+  @Column({ type: "string" })
   description: string;
 
-  @Column(DataType.STRING)
+  @Column({ type: "string" })
   recommendations: string;
 
-  @Column(DataType.BOOLEAN)
+  @Column({ type: "boolean" })
   isDraft: boolean;
 
-  @ForeignKey(() => Users)
-  @Column(DataType.INTEGER)
-  userId: number;
-
-  @ForeignKey(() => Questions)
-  @Column(DataType.INTEGER)
-  questionId: number;
-
-  @BelongsTo(() => Questions)
+  @ManyToOne(() => Questions, (question) => question.answers)
   question: Questions;
 
-  @BelongsTo(() => Users)
+  @Column({ type: "number" })
+  userId: number;
+
+  @Column({ type: "number" })
+  questionId: number;
+
+  @ManyToOne(() => Users, (user) => user.answers)
   user: Users;
 
-  @Column(DataType.DATE)
+  @Column({ type: "date", default: Date.now() })
   createdAt: Date;
 
-  @Column(DataType.DATE)
+  @Column({ type: "date" })
   updatedAt: Date;
 
-  @Column(DataType.DATE)
+  @Column({ type: "date" })
   deletedAt: Date;
 
-  @Column(DataType.INTEGER)
+  @Column({ type: "number" })
   createdBy: number;
 
-  @Column(DataType.INTEGER)
+  @Column({ type: "number" })
   updatedBy: number;
 
-  @Column(DataType.INTEGER)
+  @Column({ type: "number" })
   deletedBy: number;
 }

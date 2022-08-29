@@ -1,4 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
+import { Repository } from "typeorm";
 import { QuestionNotFound } from "src/common/utils/errors";
 import { PROVIDERS } from "src/common/constants";
 import { UserInfoDto } from "src/common/dto/user_info.dto";
@@ -13,7 +14,7 @@ import { CreateAnswersDto } from "../answers/dto/create-answers.dto";
 export class QuestionsService {
   constructor(
     @Inject(PROVIDERS.QUESTION_PROVIDER)
-    private readonly questionModel: typeof Questions,
+    private readonly questionRepository: Repository<Questions>,
     private readonly answersService: AnswersService
   ) {}
 
@@ -21,7 +22,7 @@ export class QuestionsService {
     question: CreateQuestionsDto,
     user: UserInfoDto
   ): Promise<Questions> {
-    return this.questionModel.create({
+    return this.questionRepository.save({
       ...question,
       userId: user.id,
       createdBy: user.id,
@@ -33,12 +34,10 @@ export class QuestionsService {
     offset: number,
     pageNr: number
   ): Promise<Questions[]> {
-    // console.log(limit, offset, pageNr);
-
-    const questions = await this.questionModel.findAll({
-      limit,
-      offset: pageNr * offset,
-      order: [["tags", "DESC"]],
+    const questions = await this.questionRepository.find({
+      take: limit,
+      skip: pageNr * offset,
+      order: { tags: "DESC" },
     });
     return questions;
   }
@@ -46,16 +45,16 @@ export class QuestionsService {
   public async getOneQuestionWithAnswers(
     questionId: number
   ): Promise<Questions> {
-    const question = await this.questionModel
-      .scope("oneQuestionWithAnswers")
-      .findOne({
-        where: {
-          id: questionId,
-        },
-      });
+    const question = await this.questionRepository.findOne({
+      where: {
+        id: questionId,
+      },
+    });
     if (!question) {
       throw QuestionNotFound;
     }
+    const answers = await this.answersService.findAll(questionId);
+    question.answers = answers;
     return question;
   }
 
@@ -64,7 +63,7 @@ export class QuestionsService {
     data: UpdateQuestionsDto,
     user: UserInfoDto
   ): Promise<Questions> {
-    const question = await this.questionModel.findOne({
+    const question = await this.questionRepository.findOne({
       where: {
         id: questionId,
         userId: user.id,
@@ -73,19 +72,25 @@ export class QuestionsService {
     if (!question) {
       throw QuestionNotFound;
     }
-    await question.update({
+    await this.questionRepository.update(question, {
       ...data,
       updatedAt: new Date(),
       updatedBy: user.id,
     });
-    return question;
+    const question2 = await this.questionRepository.findOne({
+      where: {
+        id: questionId,
+        userId: user.id,
+      },
+    });
+    return question2;
   }
 
   public async deleteQuestion(
     questionId: number,
     user: UserInfoDto
   ): Promise<Questions> {
-    const question = await this.questionModel.findOne({
+    const question = await this.questionRepository.findOne({
       where: {
         id: questionId,
         userId: user.id,
@@ -94,9 +99,17 @@ export class QuestionsService {
     if (!question) {
       throw QuestionNotFound;
     }
-    await question.update({ deletedBy: user.id });
-    await question.destroy();
-    return question;
+    await this.questionRepository.update(question, {
+      deletedBy: user.id,
+    });
+    await this.questionRepository.softDelete(question);
+    const question2 = await this.questionRepository.findOne({
+      where: {
+        id: questionId,
+        userId: user.id,
+      },
+    });
+    return question2;
   }
 
   public async createOrUpdateDraftAnswer(
@@ -104,7 +117,7 @@ export class QuestionsService {
     user: UserInfoDto,
     data: CreateAnswersDto
   ): Promise<Answers> {
-    const q = await this.questionModel.findOne({
+    const q = await this.questionRepository.findOne({
       where: {
         id: questionId,
       },

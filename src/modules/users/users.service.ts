@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Inject, Injectable, Logger, LoggerService } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { Op } from "sequelize";
+import { Repository } from "typeorm";
 import { InvalidCredentials, UserAlreadyExists } from "src/common/utils/errors";
 import { comparePassword, generateToken, hashPassword } from "src/common/utils";
 import { Users } from "./users.model";
@@ -12,7 +12,7 @@ import { LoginDto, SignUpDto } from "./dto";
 export class UsersService {
   constructor(
     @Inject(PROVIDERS.USER_PROVIDER)
-    private readonly userModel: typeof Users,
+    private readonly userRepository: Repository<Users>,
     private readonly configService: ConfigService,
     @Inject(Logger) private readonly logger: LoggerService
   ) {}
@@ -50,13 +50,13 @@ export class UsersService {
     email: string
   ): Promise<Users> {
     this.logger.log(`Finding user with email ${email} or username ${userName}`);
-    return this.userModel.scope(["basic"]).findOne({
-      where: { [Op.or]: [{ userName }, { email }] },
+    return this.userRepository.findOne({
+      where: [{ userName }, { email }],
     });
   }
   public async findUserById(id: number): Promise<Users> {
     this.logger.log(`Finding user with id ${id}`);
-    return this.userModel.scope(["no_password", "basic"]).findOne({
+    return this.userRepository.findOne({
       where: { id },
     });
   }
@@ -76,7 +76,7 @@ export class UsersService {
 
     // create the user
     try {
-      const newUser = await this.userModel.create<Users>({ ...user });
+      const newUser = await this.userRepository.save({ ...user });
       // tslint:disable-next-line: no-string-literal
       const { password, middleName, ...result } = newUser["dataValues"];
 

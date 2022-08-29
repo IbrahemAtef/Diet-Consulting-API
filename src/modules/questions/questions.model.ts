@@ -1,80 +1,71 @@
 import {
-  AutoIncrement,
+  Entity,
+  PrimaryGeneratedColumn,
   Column,
-  DataType,
-  ForeignKey,
-  HasMany,
-  Model,
-  PrimaryKey,
-  Scopes,
-  Table,
-} from "sequelize-typescript";
+  OneToMany,
+  ManyToOne,
+} from "typeorm";
 import { Users } from "../users/users.model";
 import { Answers } from "../answers/answers.model";
 import { TAGS } from "./../../common/enums/tags.enums";
 
-@Scopes(() => ({
-  oneQuestionWithAnswers: {
-    include: [
-      {
-        model: Answers,
-        required: false,
-        where: {
-          isDraft: false,
-        },
-        include: [
-          {
-            model: Users,
-            attributes: ["id", "firstName", "lastName"],
-          },
-        ],
-      },
-    ],
-  },
-}))
-@Table({
-  paranoid: true,
-  tableName: "Questions",
-  underscored: true,
-  timestamps: true,
-})
-export class Questions extends Model<Questions> {
-  @PrimaryKey
-  @AutoIncrement
-  @Column(DataType.INTEGER)
+// @Scopes(() => ({
+//   oneQuestionWithAnswers: {
+//     include: [
+//       {
+//         model: Answers,
+//         required: false,
+//         where: {
+//           isDraft: false,
+//         },
+//         include: [
+//           {
+//             model: Users,
+//             attributes: ["id", "firstName", "lastName"],
+//           },
+//         ],
+//       },
+//     ],
+//   },
+// }))
+@Entity({ name: "Questions" })
+export class Questions {
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column(DataType.STRING)
+  @Column({ type: "string" })
   title: string;
 
-  @Column(DataType.STRING)
+  @Column({ type: "string" })
   description: string;
 
-  @Column(DataType.ENUM(...Object.values(TAGS)))
+  @Column({ enum: [...Object.values(TAGS)] })
   tags: string;
 
-  @ForeignKey(() => Users)
-  @Column(DataType.INTEGER)
+  @Column({ type: "number" })
   userId: number;
 
-  @HasMany(() => Answers)
+  @ManyToOne(() => Users, (user) => user.question)
+  user: Users;
+
+  @OneToMany(() => Answers, (answer) => answer.questionId)
   answers: Answers[];
 
-  @Column(DataType.DATE)
+  @Column({ type: "date", default: Date.now() })
   createdAt: Date;
 
-  @Column(DataType.DATE)
+  @Column({ type: "date" })
   updatedAt: Date;
 
-  @Column(DataType.DATE)
+  @Column({ type: "date" })
   deletedAt: Date;
 
-  @Column(DataType.INTEGER)
+  @Column({ type: "number" })
   createdBy: number;
 
-  @Column(DataType.INTEGER)
+  @Column({ type: "number" })
   updatedBy: number;
 
-  @Column(DataType.INTEGER)
+  @Column({ type: "number" })
   deletedBy: number;
 }

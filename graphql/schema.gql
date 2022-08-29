@@ -86,7 +86,7 @@ type Query {
     allQuestions(pageNr: Int, limit: Int, offset: Int): [Question!]
     oneQuestion(id: ID!): Question
     allAnswers(questionId: ID!): [Answer!]
-    findDraft(questionId: ID!, userL User!): Answer
+    findDraft(questionId: ID!, user: User!): Answer
     findUserById(id: ID!): User
     findOneByEmailOrUserName(userName: String, email: String): User
 }

@@ -1,83 +1,76 @@
-import {
-  Table,
-  Column,
-  DataType,
-  Model,
-  PrimaryKey,
-  AutoIncrement,
-  Scopes,
-} from "sequelize-typescript";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Questions } from "./../questions/questions.model";
+import { Answers } from "./../answers/answers.model";
 import { ROLES } from "../../common/enums";
 
-@Scopes(() => {
-  return {
-    no_password: {
-      attributes: {
-        exclude: ["password"],
-      },
-    },
-    basic: {
-      attributes: {
-        exclude: [
-          "updatedAt",
-          "createdAt",
-          "updatedBy",
-          "createdBy",
-          "deletedAt",
-          "deletedBy",
-        ],
-      },
-    },
-  };
-})
-@Table({
-  tableName: "Users",
-  underscored: true,
-  paranoid: true,
-  timestamps: true,
-})
-export class Users extends Model<Users> {
-  @PrimaryKey
-  @AutoIncrement
-  @Column(DataType.INTEGER)
+// @Scopes(() => {
+//   return {
+//     no_password: {
+//       attributes: {
+//         exclude: ["password"],
+//       },
+//     },
+//     basic: {
+//       attributes: {
+//         exclude: [
+//           "updatedAt",
+//           "createdAt",
+//           "updatedBy",
+//           "createdBy",
+//           "deletedAt",
+//           "deletedBy",
+//         ],
+//       },
+//     },
+//   };
+// })
+@Entity({ name: "Users" })
+export class Users {
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column(DataType.STRING)
+  @Column({ type: "string" })
   userName: string;
 
-  @Column(DataType.STRING)
+  @Column({ unique: true, type: "string" })
   email: string;
 
-  @Column(DataType.STRING)
+  @Column({ type: "string" })
   password: string;
 
-  @Column(DataType.STRING)
+  @Column({ type: "string" })
   firstName: string;
 
-  @Column(DataType.STRING)
+  @Column({ type: "string" })
   middleName?: string;
 
-  @Column(DataType.STRING)
+  @Column({ type: "string" })
   lastName: string;
 
-  @Column(DataType.ENUM(...Object.values(ROLES)))
+  @Column({ enum: [...Object.values(ROLES)] })
   role: string;
 
-  @Column(DataType.DATE)
+  @OneToMany(() => Questions, (question) => question.userId)
+  question: Questions[];
+
+  @OneToMany(() => Answers, (answer) => answer.questionId)
+  answers: Answers[];
+
+  @Column({ type: "date", default: Date.now() })
   createdAt: Date;
 
-  @Column(DataType.DATE)
+  @Column({ type: "date" })
   updatedAt: Date;
 
-  @Column(DataType.DATE)
+  @Column({ type: "date" })
   deletedAt: Date;
 
-  @Column(DataType.INTEGER)
+  @Column({ type: "number" })
   createdBy: number;
 
-  @Column(DataType.INTEGER)
+  @Column({ type: "number" })
   updatedBy: number;
 
-  @Column(DataType.INTEGER)
+  @Column({ type: "number" })
   deletedBy: number;
 }
