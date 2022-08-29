@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { QuestionNotForUser, QuestionNotFound } from "src/common/utils/errors";
+import { QuestionNotFound } from "src/common/utils/errors";
 import { PROVIDERS } from "src/common/constants";
 import { UserInfoDto } from "src/common/dto/user_info.dto";
 import { AnswersService } from "../answers/answers.service";

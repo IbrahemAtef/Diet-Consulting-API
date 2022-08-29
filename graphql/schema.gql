@@ -1,0 +1,147 @@
+interface Node {
+    id: ID!
+    createdAt: DateTime!
+    updatedAt: DateTime
+    deletedAt: DateTime
+    createdBy: Int
+    updatedBy: Int
+    deletedBy: Int
+}
+// what is the input for the enum
+enum Role {
+    PATIENT
+    CONSULTANT
+}
+// is it needed or not
+scalar DateTime
+
+type User implements Node {
+    id: ID!
+    userName: String!
+    email: String!
+    password: String!
+    firstName: String!
+    middleName?: String
+    lastName: String!
+    role: Role!
+    createdAt: DateTime!
+    updatedAt: DateTime
+    deletedAt: DateTime
+    createdBy: Int
+    updatedBy: Int
+    deletedBy: Int
+}
+
+enum Tags {
+    DIABETES
+    RARE_DISEASES
+    ATHLETES_DISEASES
+    HYPERTENSION
+}
+// review the userId & answers
+type Question implements Node {
+    id: ID!
+    title: String!
+    description: String!
+    tags: Tags!
+    userId: (id: ID!): User!
+    answers: Answer[]!
+    createdAt: DateTime!
+    updatedAt: DateTime
+    deletedAt: DateTime
+    createdBy: Int
+    updatedBy: Int
+    deletedBy: Int
+}
+
+type Answer implements Node {
+    id: ID!
+    title: String!
+    description: String!
+    recommendations: String!
+    isDraft: Boolean!
+    userId: (id: ID!): User!
+    questionId: (id: ID!): Question!
+    createdAt: DateTime!
+    updatedAt: DateTime
+    deletedAt: DateTime
+    createdBy: Int
+    updatedBy: Int
+    deletedBy: Int
+}
+input createAnswerDto {
+    title: String!
+    description: String!
+    recommendations: String!
+}
+
+input updateAnswerDto {
+    title?: String
+    description?: String
+    recommendations?: String
+}
+
+// do we need user argument
+type Query {
+    allQuestions(pageNr: Int, limit: Int, offset: Int): [Question!]
+    oneQuestion(id: ID!): Question
+    allAnswers(questionId: ID!): [Answer!]
+    findDraft(questionId: ID!, userL User!): Answer
+    findUserById(id: ID!): User
+    findOneByEmailOrUserName(userName: String, email: String): User
+}
+// do we put the role
+type Mutation {
+    signUp(
+        userName: String!
+        email: String!
+        password: String!
+        firstName: String!
+        middleName?: String
+        lastName: String!
+        role: Role!
+    ): User
+
+    signIn(
+        email: String!
+        password: String!
+    ): User
+
+    createQuestion(
+        title: String!
+        description: String!
+        tags: Tags!
+    ): Question
+
+// is it right like this
+    updateQuestion(
+        title?: String
+        description?: String
+        tags?: Tags
+    ): Question 
+
+    deleteQuestion(
+        questionId: ID!
+        user: User!
+    ): Question
+
+    createOrUpdateDraftAnswer(
+        user: User!
+        questionId: ID!
+        data: createAnswerDto!
+    ): Answer
+
+    updateDraft(
+        data: updateAnswerDto!
+    ): Answer
+
+    publishDraft(
+        user: User!
+        questionId: ID!
+    ): Answer
+
+    deleteAnswer(
+        user: User!
+        questionId: ID!
+    ): Answer
+}
